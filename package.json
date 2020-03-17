@@ -1,0 +1,14 @@
+{
+  "name": "comrades-bot",
+  "version": "0.0.1",
+  "description": "Bot for comrades.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Dominik Hanak, Peter Vitez",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.0.2"
+  }
+}
