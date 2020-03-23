@@ -1,20 +1,22 @@
-// require prefix and token from config
-const { prefix, token } = require('../config.json');
-
-// require the discord.js module for everything
 const Discord = require('discord.js')
 
-// create a new Discord client - this is the bot
-// TODO: rename to bot?
-const client = new Discord.Client()
+Client = {
+    config: require('../config.json'),
+    bot: new Discord.Client(),
+    commands: {}
+}
+
+const { prefix, token } = require('../config.json');
+
+let commandsList = require("fs").readdirSync('./commands/');
 
 // when the client is ready, run this code
 // this event will only trigger one time after logging in
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+Client.bot.on('ready', () => {
+    console.log(`Logged in as ${Client.bot.user.tag}!`);
 
     // set present status
-    client.user.setPresence({
+    Client.bot.user.setPresence({
         game: {
             name: 'my code',
             type: 'WATCHING'
@@ -28,25 +30,34 @@ client.on('ready', () => {
 
 // when a message is sent to any channel bot has access to, run this code
 // this event will trigger after receiving a message
-client.on('message', message => {
+Client.bot.on('message', async message => {
     console.log(message.content);
+    
+    //prevent reacting on onw messages
+    if(message.author == Client.bot.user.id) return;
 
-    if (message.content.startsWith('${prefix}nejdemipripojit')) {
-        message.channel.send('Napis \"chcem ist do voicu.\"');
-    } else if (message.content.startsWith(`${prefix}IQ`)) {
-        message.channel.send(between(0, 250));
-    }
+    commandsList.forEach(element => {
+        if (element.match(/\.js$/)) { 
+            delete require.cache[require.resolve(`./commands/${element}`)]; 
+            Client.commands[element.slice(0, -3)] = require(`./commands/${element}`);
+        }
+    });
+    console.log(`loaded commands ${commandsList}`)
+    
+    args = message.content.slice(Client.config.prefix.length).split(' ');
+    console.log(args)
+    
+    if (!message.content.startsWith(Client.config.prefix)) 
+        return;
+
+    commandsList.forEach(cmd => {
+        console.log(args[0].toLowerCase());
+        console.log(cmd.slice(0,-3).toLowerCase());
+        cmd = cmd.slice(0,-3);
+        if (args[0].toLowerCase() === cmd.toLowerCase()) {
+            Client.commands[cmd].func(Client, message, args);
+        }   
+    });
 });
 
-/**
- * Returns a random number between min (inclusive) and max (exclusive)
- */
-function between(min, max) {
-    return Math.floor(
-        Math.random() * (max - min) + min
-    )
-}
-
-
-
-client.login(token);
+Client.bot.login(token);
