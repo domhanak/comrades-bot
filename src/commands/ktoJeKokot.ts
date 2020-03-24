@@ -5,7 +5,6 @@ export default class KtoJeKokot extends Command {
   async execute() {
     var userArr = this.client.users.cache;
     let num: number = getRandomInt(0, userArr.size);
-    console.log(user);
     var user = userArr.random();
 
     this.message.channel.send(`<@${user.id}> je kokot.`);

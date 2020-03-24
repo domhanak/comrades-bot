@@ -4,7 +4,6 @@ import IQ from './iq';
 import Dopice from './dopice';
 import Stop from './stop';
 import Skip from './skip';
-import Play from './play';
 import KtoJeKokot from './ktoJeKokot';
 
 const CommandsList: Record<string, typeof Command> = {
@@ -13,7 +12,6 @@ const CommandsList: Record<string, typeof Command> = {
   dopice: Dopice,
   stop: Stop,
   skip: Skip,
-  play: Play,
   ktojekokot: KtoJeKokot,
 };
 
