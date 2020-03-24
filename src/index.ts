@@ -3,8 +3,7 @@ import { Message } from 'discord.js';
 import { config } from 'dotenv';
 import CommandsList from './commands';
 import Command from './command';
-
-config({ path: `${process.cwd()}/.local.env` });
+import './env';
 
 @Discord
 export class AppDiscord {

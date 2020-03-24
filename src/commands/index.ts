@@ -14,6 +14,7 @@ import Playing from './playing';
 import Vtip from './Vtip';
 import Povedzvtip from './povedz-vtip';
 import PovedzDaco from './povedz-daco';
+import Pocasie from './pocasie';
 
 const CommandsList: Record<string, typeof Command> = {
   paprik: Paprik,
@@ -31,6 +32,7 @@ const CommandsList: Record<string, typeof Command> = {
   vtip: Vtip,
   povedzvtip: Povedzvtip,
   daco: PovedzDaco,
+  pocasie: Pocasie,
 };
 
 export default CommandsList;
