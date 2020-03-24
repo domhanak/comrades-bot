@@ -15,6 +15,9 @@ import Vtip from './Vtip';
 import Povedzvtip from './povedz-vtip';
 import PovedzDaco from './povedz-daco';
 import Pocasie from './pocasie';
+import Say from './say';
+import Rychlost from './rychlost';
+import Volume from './volume';
 
 const CommandsList: Record<string, typeof Command> = {
   paprik: Paprik,
@@ -33,6 +36,9 @@ const CommandsList: Record<string, typeof Command> = {
   povedzvtip: Povedzvtip,
   daco: PovedzDaco,
   pocasie: Pocasie,
+  say: Say,
+  rychlost: Rychlost,
+  volume: Volume,
 };
 
 export default CommandsList;

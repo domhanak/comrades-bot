@@ -26,8 +26,8 @@ interface Song {
   type: SongType;
   input: VoiceBroadcast | Readable | string;
   title: string;
-  options?: StreamOptions;
   voiceConnection: VoiceConnection;
+  voice?: string;
 }
 
 type SongQueue = Array<Song>;
@@ -35,6 +35,8 @@ type SongQueue = Array<Song>;
 class PlayManager {
   songPlaying: PlayingSong | null = null;
   songQueue: SongQueue;
+  speed = 1;
+  volume = 1;
 
   constructor() {
     this.songQueue = [];
@@ -62,12 +64,21 @@ class PlayManager {
     return await voiceChannel.join();
   }
 
-  private playSong(song: Song) {
-    const play = song.voiceConnection.play(song.input, song.options);
+  setVolume(volume: number) {
+    if (volume > 1 || volume < 0) {
+      return;
+    }
 
-    play.on('finish', () => {
-      this.songPlaying = null;
-      this.playNext();
+    this.volume = volume;
+
+    if (this.songPlaying) {
+      this.songPlaying.voiceConnection.dispatcher.setVolume(volume);
+    }
+  }
+
+  private playSong(song: Song) {
+    const play = song.voiceConnection.play(song.input, {
+      volume: this.volume,
     });
 
     this.songPlaying = {
@@ -76,6 +87,11 @@ class PlayManager {
       song: play,
       voiceConnection: song.voiceConnection,
     };
+
+    play.on('finish', () => {
+      this.songPlaying = null;
+      this.playNext();
+    });
   }
 
   private async playText(song: Song) {
@@ -86,13 +102,9 @@ class PlayManager {
     }
 
     try {
-      const soundPath = await createWavFile(song.input);
-      const play = song.voiceConnection.play(soundPath);
-
-      play.on('finish', () => {
-        unlinkSync(soundPath);
-        this.songPlaying = null;
-        this.playNext();
+      const soundPath = await createWavFile(song.input, this.speed, song.voice);
+      const play = song.voiceConnection.play(soundPath, {
+        volume: this.volume,
       });
 
       this.songPlaying = {
@@ -101,6 +113,12 @@ class PlayManager {
         song: play,
         voiceConnection: song.voiceConnection,
       };
+
+      play.on('finish', () => {
+        unlinkSync(soundPath);
+        this.songPlaying = null;
+        this.playNext();
+      });
     } catch (e) {
       console.error(e);
       this.playNext();
@@ -170,18 +188,22 @@ class PlayManager {
     this.playNext();
   }
 
-  async addSongToQueue(
-    message: Message,
-    title: string,
-    input: VoiceBroadcast | Readable | string,
-    options?: StreamOptions
-  ) {
+  async addSongToQueue({
+    message,
+    title,
+    input,
+    options,
+  }: {
+    message: Message;
+    title: string;
+    input: VoiceBroadcast | Readable | string;
+    options?: StreamOptions;
+  }) {
     const voiceConnection = await this.join(message);
 
     if (voiceConnection) {
       this.songQueue.push({
         input,
-        options,
         voiceConnection,
         title,
         type: SongType.SONG,
@@ -194,7 +216,17 @@ class PlayManager {
     }
   }
 
-  async addTextToQueue(message: Message, title: string, text: string) {
+  async addTextToQueue({
+    message,
+    title,
+    text,
+    voice,
+  }: {
+    message: Message;
+    title: string;
+    text: string;
+    voice?: string;
+  }) {
     const voiceConnection = await this.join(message);
 
     if (voiceConnection) {
@@ -203,6 +235,7 @@ class PlayManager {
         voiceConnection,
         title,
         type: SongType.TEXT,
+        voice,
       });
       this.playNext();
     } else {

@@ -15,11 +15,11 @@ export default class Play extends Command {
         }`
       );
 
-      PlayManagerInstance.addSongToQueue(
-        this.message,
-        songInfo.title,
-        ytdl(songInfo.video_url)
-      );
+      PlayManagerInstance.addSongToQueue({
+        message: this.message,
+        title: songInfo.title,
+        input: ytdl(songInfo.video_url),
+      });
     } catch (e) {
       this.message.reply('Nevymýšlaj... Také video neexistuje...');
     }

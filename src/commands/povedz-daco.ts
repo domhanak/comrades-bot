@@ -13,7 +13,12 @@ export default class PovedzDaco extends Command {
     })
       .then((response) => response.json())
       .then((data) => {
-        PlayManagerInstance.addTextToQueue(this.message, 'Daco', 'Dačo');
+        PlayManagerInstance.addTextToQueue({
+          message: this.message,
+          title: 'Daco',
+          text: 'Dačo',
+          voice: this.args[0] ?? 'Laura',
+        });
       })
       .catch(() => {
         this.message.reply('Daco sa posralo :(');

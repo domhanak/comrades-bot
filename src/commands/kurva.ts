@@ -3,10 +3,10 @@ import PlayManagerInstance from '../play-manager';
 
 export default class Kurva extends Command {
   async execute() {
-    PlayManagerInstance.addSongToQueue(
-      this.message,
-      'Kurva',
-      'http://milujipraci.cz/sfx/kurva.mp3'
-    );
+    PlayManagerInstance.addSongToQueue({
+      message: this.message,
+      title: 'Kurva',
+      input: 'http://milujipraci.cz/sfx/kurva.mp3',
+    });
   }
 }

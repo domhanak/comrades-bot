@@ -13,7 +13,12 @@ export default class PovedzVtip extends Command {
     })
       .then((response) => response.json())
       .then((data) => {
-        PlayManagerInstance.addTextToQueue(this.message, 'Joke', data.joke);
+        PlayManagerInstance.addTextToQueue({
+          message: this.message,
+          title: 'Joke',
+          text: data.joke,
+          voice: 'Agnes',
+        });
       })
       .catch(() => {
         this.message.reply('Daco sa posralo :(');

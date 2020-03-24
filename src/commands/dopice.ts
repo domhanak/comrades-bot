@@ -3,10 +3,10 @@ import PlayManagerInstance from '../play-manager';
 
 export default class Dopice extends Command {
   async execute() {
-    PlayManagerInstance.addSongToQueue(
-      this.message,
-      'Dopice',
-      'http://milujipraci.cz/sfx/do-pice.mp3'
-    );
+    PlayManagerInstance.addSongToQueue({
+      message: this.message,
+      title: 'Dopice',
+      input: 'http://milujipraci.cz/sfx/do-pice.mp3',
+    });
   }
 }
