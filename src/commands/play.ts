@@ -22,12 +22,15 @@ export default class Play extends Command {
       return;
     }
 
-    const songInfo = await ytdl.getInfo(this.args[0]);
-    const song = {
-      title: songInfo.title,
-      url: songInfo.video_url,
-    };
-
-    console.log(song);
+    try {
+      const songInfo = await ytdl.getInfo(this.args[0]);
+      const song = {
+        title: songInfo.title,
+        url: songInfo.video_url,
+      };
+      console.log(song);
+    } catch (e) {
+      console.log('Song has not been found');
+    }
   }
 }
