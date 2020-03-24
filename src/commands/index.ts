@@ -10,6 +10,10 @@ import AniZaKokot from './anizakokot';
 import JeduDoPici from './jedudopici';
 import Kurva from './kurva';
 import PastVedlePasti from './pastvedlepasti';
+import Playing from './playing';
+import Vtip from './Vtip';
+import Povedzvtip from './povedz-vtip';
+import PovedzDaco from './povedz-daco';
 
 const CommandsList: Record<string, typeof Command> = {
   paprik: Paprik,
@@ -23,6 +27,10 @@ const CommandsList: Record<string, typeof Command> = {
   skip: Skip,
   ktojekokot: KtoJeKokot,
   play: Play,
+  playing: Playing,
+  vtip: Vtip,
+  povedzvtip: Povedzvtip,
+  daco: PovedzDaco,
 };
 
 export default CommandsList;

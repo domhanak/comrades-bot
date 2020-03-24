@@ -17,7 +17,9 @@
     "dotenv": "^8.2.0",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.0.1",
+    "fs": "0.0.1-security",
     "node-fetch": "^2.6.0",
+    "say": "^0.16.0",
     "tslib": "^1.11.1",
     "ytdl-core": "^2.0.1"
   },

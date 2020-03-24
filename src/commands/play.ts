@@ -17,6 +17,7 @@ export default class Play extends Command {
 
       PlayManagerInstance.addSongToQueue(
         this.message,
+        songInfo.title,
         ytdl(songInfo.video_url)
       );
     } catch (e) {

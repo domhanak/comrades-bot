@@ -5,21 +5,32 @@ import {
   VoiceBroadcast,
   VoiceConnection,
 } from 'discord.js';
-
 import { Readable } from 'stream';
+import { createWavFile } from './utils/createWavFile';
+import { unlinkSync } from 'fs';
+const say = require('say');
+
+enum SongType {
+  SONG,
+  TEXT,
+}
 
 interface PlayingSong {
+  type: SongType;
+  title: string;
   song: StreamDispatcher;
   voiceConnection: VoiceConnection;
 }
 
-interface SongInQueue {
+interface Song {
+  type: SongType;
   input: VoiceBroadcast | Readable | string;
+  title: string;
   options?: StreamOptions;
   voiceConnection: VoiceConnection;
 }
 
-type SongQueue = Array<SongInQueue>;
+type SongQueue = Array<Song>;
 
 class PlayManager {
   songPlaying: PlayingSong | null = null;
@@ -51,6 +62,51 @@ class PlayManager {
     return await voiceChannel.join();
   }
 
+  private playSong(song: Song) {
+    const play = song.voiceConnection.play(song.input, song.options);
+
+    play.on('finish', () => {
+      this.songPlaying = null;
+      this.playNext();
+    });
+
+    this.songPlaying = {
+      type: SongType.SONG,
+      title: song.title,
+      song: play,
+      voiceConnection: song.voiceConnection,
+    };
+  }
+
+  private async playText(song: Song) {
+    if (typeof song.input !== 'string') {
+      console.error('Really? Not string?');
+      this.playNext();
+      return;
+    }
+
+    try {
+      const soundPath = await createWavFile(song.input);
+      const play = song.voiceConnection.play(soundPath);
+
+      play.on('finish', () => {
+        unlinkSync(soundPath);
+        this.songPlaying = null;
+        this.playNext();
+      });
+
+      this.songPlaying = {
+        type: SongType.SONG,
+        title: song.title,
+        song: play,
+        voiceConnection: song.voiceConnection,
+      };
+    } catch (e) {
+      console.error(e);
+      this.playNext();
+    }
+  }
+
   private playNext() {
     if (this.songQueue.length === 0) {
       return;
@@ -68,17 +124,15 @@ class PlayManager {
       return;
     }
 
-    const play = song.voiceConnection.play(song.input, song.options);
+    if (song.type === SongType.SONG) {
+      this.playSong(song);
+      return;
+    }
 
-    play.on('finish', () => {
-      this.songPlaying = null;
-      this.playNext();
-    });
-
-    this.songPlaying = {
-      song: play,
-      voiceConnection: song.voiceConnection,
-    };
+    if (song.type === SongType.TEXT) {
+      this.playText(song);
+      return;
+    }
   }
 
   public get isPlaying() {
@@ -118,17 +172,42 @@ class PlayManager {
 
   async addSongToQueue(
     message: Message,
+    title: string,
     input: VoiceBroadcast | Readable | string,
     options?: StreamOptions
   ) {
     const voiceConnection = await this.join(message);
 
     if (voiceConnection) {
-      this.songQueue.push({ input, options, voiceConnection });
+      this.songQueue.push({
+        input,
+        options,
+        voiceConnection,
+        title,
+        type: SongType.SONG,
+      });
       this.playNext();
     } else {
       message.channel.send(
         'Song cannot be played :(, voice channel cannot be established.'
+      );
+    }
+  }
+
+  async addTextToQueue(message: Message, title: string, text: string) {
+    const voiceConnection = await this.join(message);
+
+    if (voiceConnection) {
+      this.songQueue.push({
+        input: text,
+        voiceConnection,
+        title,
+        type: SongType.TEXT,
+      });
+      this.playNext();
+    } else {
+      message.channel.send(
+        'Text cannot be played :(, voice channel cannot be established.'
       );
     }
   }

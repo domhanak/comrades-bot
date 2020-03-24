@@ -5,6 +5,7 @@ export default class JeduDoPici extends Command {
   async execute() {
     PlayManagerInstance.addSongToQueue(
       this.message,
+      'Jedu do pici',
       'http://milujipraci.cz/sfx/jedu-do-pici-stadyma.mp3'
     );
   }
