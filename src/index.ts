@@ -10,7 +10,6 @@ config({ path: `${process.cwd()}/.local.env` });
 export class AppDiscord {
   private static client: Client;
   private prefix: string = '!';
-  private cachedCommandInstances: Record<string, Command> = {};
 
   static start() {
     if (!process.env.TOKEN) {
@@ -48,15 +47,7 @@ export class AppDiscord {
           console.info(`${cmd} [${args.join(', ')}] - execution`);
 
           try {
-            if (!this.cachedCommandInstances[cmd]) {
-              this.cachedCommandInstances[cmd] = new Command(
-                message,
-                client,
-                args
-              );
-            }
-
-            this.cachedCommandInstances[cmd].execute();
+            new Command(message, client, args).execute();
           } catch (e) {
             console.error(e);
             message.channel.send('Nieco sa posralo :(, pozri konzolu.');
