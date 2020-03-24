@@ -24,10 +24,11 @@ export class AppDiscord {
   async onMessage(message: Message, client: Client) {
     if (AppDiscord.client.user.id !== message.author.id) {
       if (message.content[0] === this.prefix) {
-        const [cmd, ...args] = message.content
+        let [cmd, ...args] = message.content
           .replace(this.prefix, '')
-          .toLowerCase()
           .split(' ');
+
+        cmd = cmd.toLowerCase();
 
         if (cmd === 'hello') {
           message.reply('Hello 🍻!');
