@@ -2,7 +2,7 @@ import Command from '../command';
 import fetch from 'node-fetch';
 const ytdl = require('ytdl-core');
 
-class Play extends Command {
+export default class Play extends Command {
   async execute() {
     const voiceChannel = this.message.member.voice.channel;
 
@@ -22,10 +22,12 @@ class Play extends Command {
       return;
     }
 
-    // const songInfo = await ytdl.getInfo(args[1])
-    //     const song = {
-    //         title: songInfo.title,
-    //         url: songInfo.video_url,
-    // }
+    const songInfo = await ytdl.getInfo(this.args[0]);
+    const song = {
+      title: songInfo.title,
+      url: songInfo.video_url,
+    };
+
+    console.log(song);
   }
 }

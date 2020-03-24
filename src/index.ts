@@ -10,7 +10,7 @@ config({ path: `${process.cwd()}/.local.env` });
 export class AppDiscord {
   private static client: Client;
   private prefix: string = '!';
-  private cachedInstances: Record<string, Command> = {};
+  private cachedCommandInstances: Record<string, Command> = {};
 
   static start() {
     if (!process.env.TOKEN) {
@@ -45,12 +45,22 @@ export class AppDiscord {
         const Command = CommandsList[cmd];
 
         if (Command) {
-          if (!this.cachedInstances) {
-            // create instance of command
-            this.cachedInstances[cmd] = new Command(message, client, args);
-          }
+          console.info(`${cmd} [${args.join(', ')}] - execution`);
 
-          this.cachedInstances[cmd].execute();
+          try {
+            if (!this.cachedCommandInstances[cmd]) {
+              this.cachedCommandInstances[cmd] = new Command(
+                message,
+                client,
+                args
+              );
+            }
+
+            this.cachedCommandInstances[cmd].execute();
+          } catch (e) {
+            console.error(e);
+            message.channel.send('Nieco sa posralo :(, pozri konzolu.');
+          }
 
           return;
         }
