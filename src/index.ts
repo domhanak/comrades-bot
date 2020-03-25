@@ -15,8 +15,15 @@ export class AppDiscord {
       throw new Error('Token has not been set. Define token in .local.env');
     }
 
+    console.info('Initializing');
+
     this.client = new Client();
-    this.client.login(process.env.TOKEN, `${__dirname}/*Discord.ts`);
+
+    this.client
+      .login(process.env.TOKEN, `${__dirname}/*Discord.ts`)
+      .then(() => {
+        console.info('Bot logged in');
+      });
   }
 
   @On('message')

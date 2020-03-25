@@ -10,15 +10,15 @@ export default class Play extends Command {
       this.message.reply(
         `Video ${songInfo.title} ${
           PlayManagerInstance.isPlaying
-            ? 'musí počkať v rade 🤷‍♂️'
+            ? `, tvoje musí počkať v rade 🤷‍♂ ( ${PlayManagerInstance.songQueue.length} pred tebou )`
             : 'hrá bzm bzmm bzzzm 🎉'
         }`
       );
 
-      PlayManagerInstance.addSongToQueue({
+      PlayManagerInstance.addYoutubeToQueue({
         message: this.message,
         title: songInfo.title,
-        input: ytdl(songInfo.video_url),
+        url: songInfo.video_url,
       });
     } catch (e) {
       this.message.reply('Nevymýšlaj... Také video neexistuje...');

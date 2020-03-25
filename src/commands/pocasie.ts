@@ -3,12 +3,12 @@ import fetch from 'node-fetch';
 import { Weather } from '../types/pocasie';
 
 const BRNO_ID = 3078610;
-const API_KEY = '4edfd9dc59ae334524ef90626c4a5970';
-const API_URL = `https://api.openweathermap.org/data/2.5/weather?units=metric&lang=sk&id=${BRNO_ID}&appid=${API_KEY}`;
+const API_URL = (city: number) =>
+  `https://api.openweathermap.org/data/2.5/weather?units=metric&lang=sk&id=${BRNO_ID}&appid=${process.env.WEATHER_KEY}`;
 
 export default class Pocasie extends Command {
   async execute() {
-    fetch(API_URL)
+    fetch(API_URL(BRNO_ID))
       .then<Weather>((response) => response.json())
       .then((data) => {
         if (!data.cod || data.cod !== 200) {

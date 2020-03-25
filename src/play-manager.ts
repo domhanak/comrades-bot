@@ -9,10 +9,12 @@ import { Readable } from 'stream';
 import { createWavFile } from './utils/createWavFile';
 import { unlinkSync } from 'fs';
 const say = require('say');
+const ytdl = require('ytdl-core');
 
 enum SongType {
   SONG,
   TEXT,
+  YOUTUBE,
 }
 
 interface PlayingSong {
@@ -94,6 +96,24 @@ class PlayManager {
     });
   }
 
+  private playYoutube(song: Song) {
+    const play = song.voiceConnection.play(ytdl(song.input), {
+      volume: this.volume,
+    });
+
+    this.songPlaying = {
+      type: SongType.YOUTUBE,
+      title: song.title,
+      song: play,
+      voiceConnection: song.voiceConnection,
+    };
+
+    play.on('finish', () => {
+      this.songPlaying = null;
+      this.playNext();
+    });
+  }
+
   private async playText(song: Song) {
     if (typeof song.input !== 'string') {
       console.error('Really? Not string?');
@@ -139,6 +159,11 @@ class PlayManager {
     if (!song.voiceConnection) {
       console.error('Voice connection is not established');
       this.playNext();
+      return;
+    }
+
+    if (song.type === SongType.YOUTUBE) {
+      this.playYoutube(song);
       return;
     }
 
@@ -192,12 +217,10 @@ class PlayManager {
     message,
     title,
     input,
-    options,
   }: {
     message: Message;
     title: string;
     input: VoiceBroadcast | Readable | string;
-    options?: StreamOptions;
   }) {
     const voiceConnection = await this.join(message);
 
@@ -207,6 +230,32 @@ class PlayManager {
         voiceConnection,
         title,
         type: SongType.SONG,
+      });
+      this.playNext();
+    } else {
+      message.channel.send(
+        'Song cannot be played :(, voice channel cannot be established.'
+      );
+    }
+  }
+
+  async addYoutubeToQueue({
+    message,
+    title,
+    url,
+  }: {
+    message: Message;
+    title: string;
+    url: string;
+  }) {
+    const voiceConnection = await this.join(message);
+
+    if (voiceConnection) {
+      this.songQueue.push({
+        input: url,
+        voiceConnection,
+        title,
+        type: SongType.YOUTUBE,
       });
       this.playNext();
     } else {

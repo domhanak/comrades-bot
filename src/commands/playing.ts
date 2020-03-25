@@ -11,7 +11,7 @@ export default class Playing extends Command {
     const songQueue = PlayManagerInstance.songQueue.length;
 
     this.message.reply(
-      `Totok hra 🎵 - ${PlayManagerInstance.songPlaying.title}${
+      `Totok akurat hra 🎵 - ${PlayManagerInstance.songPlaying.title}${
         songQueue
           ? ` a v caka este ${songQueue} v rade na pustenie. Daj !skip ak sa ti nepaci.`
           : ''
